@@ -1,6 +1,6 @@
 {
   "name": "slseasyrouting",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "./lib/routing.decorators.js",
   "types": "./lib",

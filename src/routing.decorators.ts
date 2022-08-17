@@ -11,11 +11,11 @@ export function Route<T extends { new (...args: any[]): {} }>(Base: T) {
       ).filter((name) => name !== "constructor");
 
       return Promise.all(methods.map(async (method) => {
-        if (typeof this[method] === "function") {
+        if (typeof this[method] === 'function') {
           return await this[method](args[0]);
         }
       })).then((result) => {
-        return result[0];
+        return result[result.length - 1];
       });
     }
   };
