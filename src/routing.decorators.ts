@@ -15,7 +15,8 @@ export function Route<T extends { new (...args: any[]): {} }>(Base: T) {
           return await this[method](args[0]);
         }
       })).then((result) => {
-        return result[result.length - 1];
+        const filteredResults = result.filter((value) => value !== undefined && value !== null);
+        return filteredResults[filteredResults.length - 1];
       });
     }
   };
