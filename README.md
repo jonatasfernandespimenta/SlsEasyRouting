@@ -43,6 +43,20 @@ export class Routes {
   }
 }
 ```
+
+Then, at your `handler.ts` file, add `return new Routes(event)`, it will look like this:
+```ts
+import { middyfy } from '@libs/lambda';
+import { Routes } from './routes';
+
+const handler = async (event) => {
+  console.log(event);
+  return new Routes(event);
+};
+
+export const main = middyfy(handler);
+```
+
 Inside the decorator, you can pass the desired endpoint, for example, `@Get('/users/email')`.
 
 This lib contains some responses too in case you want to use, for example, if you want to throw a 401, you can use `return UnAuthorized()`. You can pass a custom message too by providing it inside the function parameters, for example: `return UnAuthorized('Get out!')`.
