@@ -11,7 +11,7 @@
     "lint": "tslint -p tsconfig.json",
     "prepublish": "tsc -p ."
   },
-  "keywords": [],
+  "keywords": ["routing", "sls", "serverless", "aws", "lambda", "monolith", "router", "routes"],
   "author": "",
   "license": "ISC",
   "devDependencies": {
