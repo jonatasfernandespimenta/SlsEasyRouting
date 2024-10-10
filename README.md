@@ -22,7 +22,35 @@ hello@world:~$ npm i slseasyrouting
 ```
 
 ## 🚀 Usage
-First, you'll need to create a routes file, I recommend something like `routes.ts`, inside it, create a class called Routes and add the `@Route` decorator, inside the class, add a constructor containing the event and then the methods with the desired decorator, check the example:
+First, you'll need to enable decorators in your typescript project. You can achieve that by adding this line under compilerOptions in your tsconfig.json:
+```json
+"experimentalDecorators": true
+```
+
+Now you have to configure your serverless to accept any request to any endpoint. Here is my serverless.yml function config:
+```ts
+ functions: {
+    main: {
+      handler: hello.handler,
+      events: [
+        {
+          http: {
+            method: 'ANY',
+            path: '/',
+          },
+        },
+        {
+          http: {
+            method: 'ANY',
+            path: '{proxy+}',
+          },
+        },
+      ],
+    },
+  },
+```
+
+After this, you'll need to create a routes file, I recommend something like `routes.ts`, inside it, create a class called Routes and add the `@Route` decorator, inside the class, add a constructor containing the event and then the methods with the desired decorator, check the example:
 
 ```ts
 import { getDate, hello } from "./services/hello.service";
