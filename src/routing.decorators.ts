@@ -29,8 +29,11 @@ export function Get(path: string) {
     descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value;
+
     descriptor.value = async function (...args: any[]) {
-      if (eventValues.httpMethod === "GET" && eventValues.resource === path) {
+      const requestedPath = eventValues.path || eventValues.pathParameters?.proxy || '';
+
+      if (eventValues.httpMethod === "GET" && requestedPath === path) {
         return originalMethod.apply(this, args);
       }
     };
@@ -45,7 +48,9 @@ export function Post(path: string) {
   ) {
     const originalMethod = descriptor.value;
     descriptor.value = async function (...args: any[]) {
-      if (eventValues.httpMethod === "POST" && eventValues.resource === path) {
+      const requestedPath = eventValues.path || eventValues.pathParameters?.proxy || '';
+
+      if (eventValues.httpMethod === "POST" && requestedPath === path) {
         return originalMethod.apply(this, args);
       }
     };
@@ -60,9 +65,11 @@ export function Delete(path: string) {
   ) {
     const originalMethod = descriptor.value;
     descriptor.value = async function (...args: any[]) {
+      const requestedPath = eventValues.path || eventValues.pathParameters?.proxy || '';
+
       if (
         eventValues.httpMethod === "DELETE" &&
-        eventValues.resource === path
+        requestedPath === path
       ) {
         return originalMethod.apply(this, args);
       }
@@ -77,8 +84,11 @@ export function Patch(path: string) {
     descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value;
+    
     descriptor.value = async function (...args: any[]) {
-      if (eventValues.httpMethod === "PATCH" && eventValues.resource === path) {
+      const requestedPath = eventValues.path || eventValues.pathParameters?.proxy || '';
+
+      if (eventValues.httpMethod === "PATCH" && eventValues.resource === requestedPath) {
         return originalMethod.apply(this, args);
       }
     };
@@ -93,7 +103,9 @@ export function Put(path: string) {
   ) {
     const originalMethod = descriptor.value;
     descriptor.value = async function (...args: any[]) {
-      if (eventValues.httpMethod === "PUT" && eventValues.resource === path) {
+      const requestedPath = eventValues.path || eventValues.pathParameters?.proxy || '';
+
+      if (eventValues.httpMethod === "PUT" && eventValues.resource === requestedPath) {
         return originalMethod.apply(this, args);
       }
     };
