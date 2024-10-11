@@ -42,3 +42,10 @@ export function ServiceUnavailable(message?: string) {
     })
   };
 }
+
+export function Success(data: any) {
+  return {
+    statusCode: 200,
+    body: JSON.stringify(data),
+  };
+}

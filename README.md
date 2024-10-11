@@ -99,3 +99,4 @@ As said before, this lib contains some functions that you can call for responses
 | Gone               |     410     |
 | BadRequest         |     400     |
 | ServiceUnavailable |     503     |
+| Success            |     200     |
