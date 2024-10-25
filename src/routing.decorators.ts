@@ -31,9 +31,14 @@ export function Get(path: string) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
-      const requestedPath = eventValues.path || eventValues.pathParameters?.proxy || '';
+      const event = this.event || args[0];
+      const requestedPath = event.path || event.pathParameters?.proxy || '';
+      const pathPattern = new RegExp(`^${path.replace(/\{[^}]+\}/g, '[^/]+')}$`);
 
-      if (eventValues.httpMethod === "GET" && requestedPath === path) {
+      if (
+        event.httpMethod === "GET" &&
+        (requestedPath === path || pathPattern.test(requestedPath))
+      ) {
         return originalMethod.apply(this, args);
       }
     };
@@ -64,12 +69,16 @@ export function Delete(path: string) {
     descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value;
+
     descriptor.value = async function (...args: any[]) {
-      const requestedPath = eventValues.path || eventValues.pathParameters?.proxy || '';
+      const event = this.event || args[0];
+      const requestedPath = event.path || event.pathParameters?.proxy || '';
+
+      const pathPattern = new RegExp(`^${path.replace(/\{[^}]+\}/g, '[^/]+')}$`);
 
       if (
-        eventValues.httpMethod === "DELETE" &&
-        requestedPath === path
+        event.httpMethod === "DELETE" &&
+        (requestedPath === path || pathPattern.test(requestedPath))
       ) {
         return originalMethod.apply(this, args);
       }
@@ -84,17 +93,18 @@ export function Patch(path: string) {
     descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value;
-    
-    descriptor.value = async function (...args: any[]) {
-      const requestedPath = eventValues.path || eventValues.pathParameters?.proxy || '';
 
-      if (eventValues.httpMethod === "PATCH" && eventValues.resource === requestedPath) {
+    descriptor.value = async function (...args: any[]) {
+      const event = this.event || args[0];
+      const requestedPath = event.path || event.pathParameters?.proxy || '';
+      const pathPattern = new RegExp(`^${path.replace(/\{[^}]+\}/g, '[^/]+')}$`);
+
+      if (event.httpMethod === "PATCH" && pathPattern.test(requestedPath)) {
         return originalMethod.apply(this, args);
       }
     };
   };
 }
-
 export function Put(path: string) {
   return function (
     target: any,
@@ -104,8 +114,9 @@ export function Put(path: string) {
     const originalMethod = descriptor.value;
     descriptor.value = async function (...args: any[]) {
       const requestedPath = eventValues.path || eventValues.pathParameters?.proxy || '';
+      const pathPattern = new RegExp(`^${path.replace(/\{[^}]+\}/g, '[^/]+')}$`);
 
-      if (eventValues.httpMethod === "PUT" && eventValues.resource === requestedPath) {
+      if (eventValues.httpMethod === "PUT" && pathPattern.test(requestedPath)) {
         return originalMethod.apply(this, args);
       }
     };
