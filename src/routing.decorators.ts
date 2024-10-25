@@ -54,13 +54,18 @@ export function Post(path: string) {
     const originalMethod = descriptor.value;
     descriptor.value = async function (...args: any[]) {
       const requestedPath = eventValues.path || eventValues.pathParameters?.proxy || '';
+      const pathWithOptionalId = new RegExp(`^${path.replace('{id}', '(\\w+)?')}$`);
 
-      if (eventValues.httpMethod === "POST" && requestedPath === path) {
+      if (
+        eventValues.httpMethod === "POST" &&
+        pathWithOptionalId.test(requestedPath)
+      ) {
         return originalMethod.apply(this, args);
       }
     };
   };
 }
+
 
 export function Delete(path: string) {
   return function (
