@@ -33,12 +33,23 @@ export function Get(path: string) {
     descriptor.value = async function (...args: any[]) {
       const event = this.event || args[0];
       const requestedPath = event.path || event.pathParameters?.proxy || '';
-      const pathPattern = new RegExp(`^${path.replace(/\{[^}]+\}/g, '[^/]+')}$`);
+      const pathPattern = new RegExp(`^${path.replace(/\{[^}]+\}/g, '([^/]+)')}$`);
 
       if (
         event.httpMethod === "GET" &&
-        (requestedPath === path || pathPattern.test(requestedPath))
+        pathPattern.test(requestedPath)
       ) {
+        const match = requestedPath.match(pathPattern);
+        const dynamicParameter = match ? match[1] : null;
+        const dynamicFieldName = path.match(/\{([^}]+)\}/)?.[1];
+
+        if (dynamicFieldName && dynamicParameter) {
+          event.pathParameters = {
+            ...event.pathParameters,
+            [dynamicFieldName]: dynamicParameter
+          };
+        }
+
         return originalMethod.apply(this, args);
       }
     };
@@ -52,20 +63,32 @@ export function Post(path: string) {
     descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value;
+
     descriptor.value = async function (...args: any[]) {
-      const requestedPath = eventValues.path || eventValues.pathParameters?.proxy || '';
-      const pathWithOptionalId = new RegExp(`^${path.replace('{id}', '(\\w+)?')}$`);
+      const event = this.event || args[0];
+      const requestedPath = event.path || event.pathParameters?.proxy || '';
+      const pathWithOptionalId = new RegExp(`^${path.replace(/\{[^}]+\}/g, '([^/]+)')}$`);
 
       if (
-        eventValues.httpMethod === "POST" &&
+        event.httpMethod === "POST" &&
         pathWithOptionalId.test(requestedPath)
       ) {
+        const match = requestedPath.match(pathWithOptionalId);
+        const dynamicParameter = match ? match[1] : null;
+        const dynamicFieldName = path.match(/\{([^}]+)\}/)?.[1];
+
+        if (dynamicFieldName && dynamicParameter) {
+          event.pathParameters = {
+            ...event.pathParameters,
+            [dynamicFieldName]: dynamicParameter
+          };
+        }
+
         return originalMethod.apply(this, args);
       }
     };
   };
 }
-
 
 export function Delete(path: string) {
   return function (
@@ -78,13 +101,23 @@ export function Delete(path: string) {
     descriptor.value = async function (...args: any[]) {
       const event = this.event || args[0];
       const requestedPath = event.path || event.pathParameters?.proxy || '';
-
-      const pathPattern = new RegExp(`^${path.replace(/\{[^}]+\}/g, '[^/]+')}$`);
+      const pathPattern = new RegExp(`^${path.replace(/\{[^}]+\}/g, '([^/]+)')}$`);
 
       if (
         event.httpMethod === "DELETE" &&
-        (requestedPath === path || pathPattern.test(requestedPath))
+        pathPattern.test(requestedPath)
       ) {
+        const match = requestedPath.match(pathPattern);
+        const dynamicParameter = match ? match[1] : null;
+        const dynamicFieldName = path.match(/\{([^}]+)\}/)?.[1];
+
+        if (dynamicFieldName && dynamicParameter) {
+          event.pathParameters = {
+            ...event.pathParameters,
+            [dynamicFieldName]: dynamicParameter
+          };
+        }
+
         return originalMethod.apply(this, args);
       }
     };
@@ -102,14 +135,23 @@ export function Patch(path: string) {
     descriptor.value = async function (...args: any[]) {
       const event = this.event || args[0];
       const requestedPath = event.path || event.pathParameters?.proxy || '';
-      const pathPattern = new RegExp(`^${path.replace(/\{[^}]+\}/g, '[^/]+')}$`);
 
+      const pathPattern = new RegExp(`^${path.replace(/\{[^}]+\}/g, '([^/]+)')}$`);
       if (event.httpMethod === "PATCH" && pathPattern.test(requestedPath)) {
+        const match = requestedPath.match(pathPattern);
+        const dynamicParameter = match ? match[1] : null;
+        const dynamicFieldName = path.match(/\{([^}]+)\}/)?.[1];
+
+        if(dynamicFieldName && dynamicParameter) {
+          this.event.pathParameters = JSON.parse(`{"${dynamicFieldName}": "${dynamicParameter}"}`);
+        }
+
         return originalMethod.apply(this, args);
       }
     };
   };
 }
+
 export function Put(path: string) {
   return function (
     target: any,
